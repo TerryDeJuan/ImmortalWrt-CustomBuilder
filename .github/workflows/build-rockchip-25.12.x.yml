@@ -1,10 +1,10 @@
 name: Build 25.12.x Rockchip
-# 目前此工作流可以集成imm仓库内的软件 第三方软件暂不能集成(待开发)
+# This workflow currently supports software from the imm repository; third-party software integration is not yet supported (planned)
 on:
   workflow_dispatch:
     inputs:
       luci_version:
-        description: "选择luci版本"
+        description: "Select the LuCI version"
         required: false
         default: "25.12.1"
         type: choice
@@ -14,7 +14,7 @@ on:
       profile:
         type: choice
         description: |
-          输入 软路由型号 可选值如下：
+          Enter the software router model. Available values:
         options:
           - linkease_easepi-r1
           - 9tripod_x3568-v4
@@ -81,11 +81,11 @@ on:
         required: true
         default: 'friendlyarm_nanopi-r3s'
       custom_router_ip:
-        description: "请设置软路由的管理地址(注意仅对多网口软路由有效) 格式:192.168.x.1 或 10.x.x.1"
+        description: "Set the software router management address (only valid for multi-port software routers). Format: 192.168.x.1 or 10.x.x.1"
         required: true
         default: "192.168.100.1"
       rootfs_partsize:
-        description: '选择软件包空间大小'
+        description: 'Select the package storage size'
         required: true
         type: choice
         default: '1G'
@@ -95,13 +95,13 @@ on:
           - '3G'
           - '4G'
       enable_store:
-        description: "集成 store 商店"
+        description: "Include the app store"
         required: false
         type: boolean
         default: false
       include_docker:
         description: |
-          是否编译 Docker 插件
+          Build the Docker plugin?
         required: true
         default: 'yes'
         type: choice
@@ -109,7 +109,7 @@ on:
           - 'yes'
           - 'no'
       enable_pppoe:
-        description: "是否配置PPPoE拨号信息?"
+        description: "Configure PPPoE credentials?"
         required: true
         default: 'no'
         type: choice
@@ -117,10 +117,10 @@ on:
         - 'yes'
         - 'no'
       pppoe_account:
-        description: "宽带账号 (若启用PPPoE)"
+        description: "Broadband account (if PPPoE is enabled)"
         required: false
       pppoe_password:
-        description: "宽带密码 (若启用PPPoE)"
+        description: "Broadband password (if PPPoE is enabled)"
         required: false
 
 permissions:
@@ -141,8 +141,8 @@ jobs:
         run: |
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
-          echo "您设置的Rockchip软路由管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
+          echo "The Rockchip software router management address you set is: ${{ github.event.inputs.custom_router_ip }}"
+          # A later step maps this file to /etc/config/custom_router_ip.txt on the router so the 99-custom.sh startup script can read the user-defined IP address
       
       - name: Validate PPPoE Inputs
         run: |
@@ -157,15 +157,15 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
-            echo "✅ 已追加 luci-app-store"
+            echo "✅ Added luci-app-store"
           else
-            echo "❎ 未启用 luci-app-store"
+            echo "❎ luci-app-store is not enabled"
           fi
       - name: Check Docker
         run: |
           if [[ "${{ inputs.include_docker }}" == "yes" ]]; then
              echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES docker"' >> shell/custom-packages.sh
-             echo "✅ 已为Rockchip平台补充 docker 组件"
+             echo "✅ Added the docker component for the Rockchip platform"
           fi
       
 
@@ -212,19 +212,19 @@ jobs:
       - name: Create info
         run: |
           cat > ${{ github.workspace }}/router-info.md <<EOF
-          ## 📡 路由器后台信息
+          ## 📡 Router Administration Information
 
-          - ✳️ **软路由型号**: ${{ github.event.inputs.profile }}
-          - 🏠 **后台地址**: ${{ github.event.inputs.custom_router_ip }}
-          - 👤 **用户名**: root
-          - 🔑 **密码**: 无
+          - ✳️ **Software Router Model**: ${{ github.event.inputs.profile }}
+          - 🏠 **Administration Address**: ${{ github.event.inputs.custom_router_ip }}
+          - 👤 **Username**: root
+          - 🔑 **Password**: None
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="#### 默认带docker"
+            extra_content="#### Docker included by default"
             echo -e "\n$extra_content" >> ${{ github.workspace }}/router-info.md
           else
-            echo -e "\n#### 不带docker" >> ${{ github.workspace }}/router-info.md
+            echo -e "\n#### Docker not included" >> ${{ github.workspace }}/router-info.md
           fi
 
       - name: Upload ImmortWrt as release assets

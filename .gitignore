@@ -1,0 +1,8 @@
+# Local router inventories and backups contain secrets and device identity.
+local-backups/
+router-audits/
+router-backups/
+*.img
+*.img.gz
+*.tar.gz
+*.sha256

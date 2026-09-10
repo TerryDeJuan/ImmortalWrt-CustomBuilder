@@ -1,19 +1,19 @@
-# 此工作流99% 使用luci 24.10.x 来构建 极个别机型使用快照版和23.05.4版本来构建
-# 23.05.4 特有机型列表
+# This workflow builds 99% of models with LuCI 24.10.x; a few models use snapshot or 23.05.4 builds
+# Models available only in 23.05.4
 # abt_asr3000-ubootmod
 # cetron_ct3003-stock
 # cmcc_a10
 # cmcc_rax3000m-emmc-ubootmod
 # cmcc_rax3000m-nand-ubootmod
 # imou_lc-hx3001-ubootmod
-# jcg_q30 捷成
+# jcg_q30 Jiecheng
 # jcg_q30-ubootmod
 # qihoo_360t7-ubootmod
 # xiaomi_mi-router-wr30u-112m-nmbm
-# xiaomi_redmi-router-ax6000 该机型在24.10.5 分化为2个机型
+# xiaomi_redmi-router-ax6000 This model was split into two variants in 24.10.5
 # —————————————————————————————24.10.5—————————————————————————————————
-# xiaomi_redmi-router-ax6000-stock ————原厂默认 bootloader（stock）版本
-# xiaomi_redmi-router-ax6000-ubootmod—————改装过 bootloader 的版本（ubootmod）
+# xiaomi_redmi-router-ax6000-stock ————Factory-default bootloader (stock) version
+# xiaomi_redmi-router-ax6000-ubootmod—————Modified bootloader (ubootmod) version
 
 
 name: Build 25.12.x Wireless Router
@@ -23,7 +23,7 @@ on:
     inputs:
       profile:
         type: choice
-        description: "请选择mtk路由器型号"
+        description: "Select the MTK router model"
         required: true
         options:
           - aliyun_ap8220
@@ -36,7 +36,7 @@ on:
           - glinet_gl-b2200
           - glinet_gl-x3000
           - glinet_gl-xe3000
-          # 就是Fudy MT3000
+          # This is the Fudy MT3000
           - huasifei_wh3000-emmc
           - cudy_tr3000-v1
           - cudy_tr3000-v1-ubootmod
@@ -44,7 +44,7 @@ on:
           - jcg_q30-pro
           - jcg_q30
           - jcg_q30-ubootmod
-          # 京东云AX6000百里
+          # JD Cloud AX6000 Baili
           - jdcloud_re-cp-03
           - xiaomi_mi-router-ax3000t
           - xiaomi_mi-router-ax3000t-ubootmod
@@ -184,7 +184,7 @@ on:
           - zte_mf269
           - zte_mf269-stock
           - zyxel_nbg7815
-          #324 新增mt7621平台的路由器
+          #324 Add routers based on the mt7621 platform
           - adslr_g7
           - afoundry_ew1200
           - alfa-network_ax1800rm
@@ -452,7 +452,7 @@ on:
           - zyxel_nwa55axe
           - zyxel_wap6805
           - zyxel_wsm20
-          # 新增斐讯K3 AC88U等 bcm53xx/generic 平台
+          # Add Phicomm K3, AC88U, and other bcm53xx/generic platform models
           - phicomm_k3
           - asus_rt-ac3100
           - asus_rt-ac56u
@@ -489,17 +489,17 @@ on:
           - tenda_ac9
         default: glinet_gl-mt6000
       custom_router_ip:
-        description: "请设置路由器的管理地址 格式:192.168.x.1 或 10.x.x.1"
+        description: "Set the router management address. Format: 192.168.x.1 or 10.x.x.1"
         required: true
         default: "192.168.100.1"
       enable_store:
-        description: "集成 store 商店"
+        description: "Include the app store"
         required: false
         type: boolean
         default: false
       include_docker:
         description: |
-          是否编译 Docker 插件
+          Build the Docker plugin?
         required: true
         default: 'no'
         type: choice
@@ -507,7 +507,7 @@ on:
           - 'yes'
           - 'no'
       enable_pppoe:
-        description: "是否配置PPPoE拨号信息?"
+        description: "Configure PPPoE credentials?"
         required: true
         default: 'no'
         type: choice
@@ -515,10 +515,10 @@ on:
           - 'yes'
           - 'no'
       pppoe_account:
-        description: "宽带账号 (若启用PPPoE)"
+        description: "Broadband account (if PPPoE is enabled)"
         required: false
       pppoe_password:
-        description: "宽带密码 (若启用PPPoE)"
+        description: "Broadband password (if PPPoE is enabled)"
         required: false
 
 
@@ -541,8 +541,8 @@ jobs:
         run: |
           mkdir -p "${{ github.workspace }}/custom"
           echo "${{ github.event.inputs.custom_router_ip }}" > "${{ github.workspace }}/custom/custom_router_ip.txt"
-          echo "您设置的路由器管理地址是:${{ github.event.inputs.custom_router_ip }}"
-          # 后续步骤会将该文件映射到路由器/etc/config/custom_router_ip.txt 以便用于开机脚本99-custom.sh读取用户设置的ip
+          echo "The router management address you set is: ${{ github.event.inputs.custom_router_ip }}"
+          # A later step maps this file to /etc/config/custom_router_ip.txt on the router so the 99-custom.sh startup script can read the user-defined IP address
 
 
       - name: Validate PPPoE Inputs
@@ -557,9 +557,9 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.enable_store }}" == "true" ]; then
             echo 'CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-store"' >> shell/apk-custom-packages.sh
-            echo "✅ 已追加 luci-app-store"
+            echo "✅ Added luci-app-store"
           else
-            echo "❎ 未启用 luci-app-store"
+            echo "❎ luci-app-store is not enabled"
           fi
       
     
@@ -568,10 +568,10 @@ jobs:
           profile="${{ github.event.inputs.profile }}"
           echo "Building for profile: $profile"
           include_docker="${{ github.event.inputs.include_docker }}"
-          # 默认平台
+          # Default platform
           echo "platform=mediatek/filogic" >> $GITHUB_ENV
 
-          # 读取 ipq807x 机型文件
+          # Read the ipq807x model file
           ipq807x_models=$(cat model/ipq807x.txt | tr '\n' '|')
           ipq807x_models=${ipq807x_models%|}
           if [[ "$profile" =~ ^($ipq807x_models)$ ]]; then
@@ -579,7 +579,7 @@ jobs:
               case_platform="qualcommax/ipq807x"
           fi
 
-          # 读取 mt7621 机型文件
+          # Read the mt7621 model file
           mt7621_models=$(cat model/mt7621.txt | tr '\n' '|')
           mt7621_models=${mt7621_models%|}
           if [[ "$profile" =~ ^($mt7621_models)$ ]]; then
@@ -587,7 +587,7 @@ jobs:
               case_platform="ramips/mt7621"
           fi
 
-          # 读取 bcm53xx/generic 机型文件
+          # Read the bcm53xx/generic model file
           bcm53xx_models=$(cat model/bcm53xx.txt | tr '\n' '|')
           bcm53xx_models=${bcm53xx_models%|}
           if [[ "$profile" =~ ^($bcm53xx_models)$ ]]; then
@@ -595,15 +595,15 @@ jobs:
               case_platform="bcm53xx/generic"
           fi
 
-          # 判断机型
+          # Determine the model
           case "$profile" in
               glinet_gl-b2200)
-                  # 虽然它是高通ipq40xx平台 但由于都是gl机型 故放在一起 找起来方便
+                  # Although this uses the Qualcomm ipq40xx platform, it is grouped with the other GL models for convenience
                   tag=ipq40xx-generic-openwrt-25.12.1
                   echo "platform=ipq40xx/generic" >> $GITHUB_ENV
                   ;;
               glinet_gl-axt1800|glinet_gl-ax1800)
-                  # 虽然它是高通ipq60xx平台 但由于都是gl机型 故放在一起 找起来方便
+                  # Although this uses the Qualcomm ipq60xx platform, it is grouped with the other GL models for convenience
                   tag=qualcommax-ipq60xx-snapshot
                   echo "platform=qualcommax/ipq60xx" >> $GITHUB_ENV
                   ;;
@@ -611,7 +611,7 @@ jobs:
                   tag=mediatek-mt7622-openwrt-25.12.1
                   echo "platform=mediatek/mt7622" >> $GITHUB_ENV
                   ;;
-              # 下列机型目前没有25.12 因此采用23.05.4分支来构建
+              # The following models do not currently support 25.12, so build them from the 23.05.4 branch
               cmcc_rax3000m-emmc-ubootmod | \
               cmcc_rax3000m-nand-ubootmod | \
               cmcc_a10 | \
@@ -628,12 +628,12 @@ jobs:
                   cp ${{ github.workspace }}/mediatek-filogic/build23.sh ${{ github.workspace }}/mediatek-filogic/build25.sh
                   ;;
               *)
-                  # 如果前面匹配了 ipq807x、mt7621、bcm53xx 机型文件，则使用对应 tag
+                  # If an ipq807x, mt7621, or bcm53xx model file matched above, use the corresponding tag
                   if [[ -n "$case_tag" ]]; then
                       tag=$case_tag
                       echo "platform=$case_platform" >> $GITHUB_ENV
                   else
-                      # 默认分支
+                      # Default branch
                       tag=mediatek-filogic-openwrt-25.12.1
                   fi
                   ;;
@@ -657,13 +657,13 @@ jobs:
       - name: Create info
         run: |
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
-            extra_content="### 默认带docker"
+            extra_content="### Docker included by default"
             echo -e "\n $extra_content" >> ${{ github.workspace }}/mediatek-filogic/info.md
           else
             echo -e "NO docker"
           fi
           custom_router_ip="${{ github.event.inputs.custom_router_ip }}"
-          extra_content_ip="#### 管理地址 $custom_router_ip"
+          extra_content_ip="#### Management Address $custom_router_ip"
           echo -e "\n $extra_content_ip" >> ${{ github.workspace }}/mediatek-filogic/info.md
           
           

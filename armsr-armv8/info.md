@@ -1,17 +1,17 @@
-[![Github](https://img.shields.io/badge/Release文件可在国内加速站下载-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1) 
-#### 此固件为ARM64虚拟机专用
-#### 格式为qcow2 该格式可在虚拟机里自由扩展大小 无需添加另一块虚拟硬盘
-#### 固件地址 `192.168.100.1`
-#### 用户名 `root` 密码：无
-#### 默认软件包大小 2GB
+[![GitHub](https://img.shields.io/badge/Releases_available_from_a_China--based_accelerator-FC7C0D?logo=github&logoColor=fff&labelColor=000&style=for-the-badge)](https://wkdaily.cpolar.top/archives/1)
+#### This firmware is intended specifically for ARM64 virtual machines.
+#### It uses the qcow2 format, which can be expanded freely inside a virtual machine without adding another virtual hard disk.
+#### Firmware address: `192.168.100.1`
+#### Username: `root`; password: none
+#### Default package size: 2 GB
 
-##### 该固件导入单网口虚拟机的时候 默认采用DHCP模式 在虚拟机终端输入`ip a` 查看ip 后访问web
-##### 该固件导入多网口虚拟机的时候 默认第一个网口采用DHCP模式 视为wan 其他网口自动br-lan 
-##### 若release中下载吃力 可在国内加速站下载 https://wkdaily.cpolar.top/archives/1
+##### When imported into a single-port virtual machine, this firmware uses DHCP by default. Run `ip a` in the virtual-machine terminal to find its IP address, then open the web interface.
+##### When imported into a multi-port virtual machine, the first network interface uses DHCP by default and acts as the WAN; the other interfaces are automatically added to br-lan.
+##### If downloading from Releases is slow, use the China-based accelerator: https://wkdaily.cpolar.top/archives/1
 
-- 你可以理解为这是一种ARM64 通用型OpenWrt ,产出格式为qcow2,适合所有ARM64平台的虚拟机
-- 举例来说 目前有哪些arm64虚拟机？
-- 比如斐讯N1刷了armbian系统,armbian系统里安装了PVE虚拟机 可用
-- 比如新款Apple Silicon芯片的苹果电脑里的虚拟机UTM 可用
-- 比如友善NanoPi R3S、R5S 官方推出的预装了PVE的debian系统 可用
-- 比如瑞莎E20C刷了Armbian系统，自己安装了QEMU+原生的KVM虚拟机 可用
+- Think of this as a general-purpose ARM64 build of OpenWrt. It is distributed in qcow2 format and is suitable for virtual machines on any ARM64 platform.
+- Examples of ARM64 virtual-machine environments include:
+- A Phicomm N1 running Armbian with PVE installed.
+- UTM on newer Apple computers with Apple silicon.
+- The official Debian system with PVE preinstalled for FriendlyElec NanoPi R3S and R5S devices.
+- A Radxa E20C running Armbian with a manually installed QEMU and native KVM setup.

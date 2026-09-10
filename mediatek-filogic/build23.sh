@@ -1,43 +1,43 @@
 #!/bin/bash
 source shell/custom-packages.sh
 source shell/switch_repository.sh
-# 该文件实际为imagebuilder容器内的build.sh
+# This file is the build.sh used inside the ImageBuilder container
 
 if [ -n "$CUSTOM_PACKAGES" ]; then
-  echo "✅ 你选择了第三方软件包：$CUSTOM_PACKAGES"
+  echo "✅ You selected third-party packages: $CUSTOM_PACKAGES"
   if [ "$PROFILE" = "glinet_gl-mt3000" ]; then
-    echo "❌ 检查到您集成了第三方软件包 由于mt3000闪存空间较小 不支持此操作"
-    echo "✅ 系统将自动帮你注释掉shell/custom-packages.sh中的插件 目前支持第三方插件集成的机型是mt2500/mt6000等大闪存机型"
+    echo "❌ Third-party packages were detected, but this is not supported because the mt3000 has limited flash space"
+    echo "✅ The system will automatically disable the plugins from shell/custom-packages.sh; models with larger flash, such as mt2500/mt6000, currently support third-party plugin integration"
     CUSTOM_PACKAGES=""
   else
-    # 下载 run 文件仓库
-    echo "🔄 正在同步第三方软件仓库 Cloning run file repo..."
+    # Download the run file repository
+    echo "🔄 Syncing third-party package repository; cloning run file repo..."
     git clone --depth=1 https://github.com/wukongdaily/store.git /tmp/store-run-repo
 
-    # 拷贝 run/arm64 下所有 run 文件和ipk文件 到 extra-packages 目录
+    # Copy all run and ipk files under run/arm64 to the extra-packages directory
     mkdir -p /home/build/immortalwrt/extra-packages
     cp -r /tmp/store-run-repo/run/arm64/* /home/build/immortalwrt/extra-packages/
 
     echo "✅ Run files copied to extra-packages:"
     ls -lh /home/build/immortalwrt/extra-packages/*.run
-    # 解压并拷贝ipk到packages目录
+    # Extract and copy ipk files to the packages directory
     sh shell/prepare-packages.sh
     ls -lah /home/build/immortalwrt/packages/
-    # 添加架构优先级信息
+    # Add architecture priority information
     sed -i '1i\
     arch aarch64_generic 10\n\
     arch aarch64_cortex-a53 15' repositories.conf
   fi
 else
-  echo "⚪️ 未选择任何第三方软件包"
+  echo "⚪️ No third-party packages were selected"
 fi
-# yml 传入的路由器型号 PROFILE
+# Router model PROFILE passed from yml
 echo "Building for profile: $PROFILE"
 echo "Include Docker: $INCLUDE_DOCKER"
 echo "Create pppoe-settings"
 mkdir -p  /home/build/immortalwrt/files/etc/config
 
-# 创建pppoe配置文件 yml传入pppoe变量————>pppoe-settings文件
+# Create the PPPoE configuration file: PPPoE variables passed from yml -> pppoe-settings file
 cat << EOF > /home/build/immortalwrt/files/etc/config/pppoe-settings
 enable_pppoe=${ENABLE_PPPOE}
 pppoe_account=${PPPOE_ACCOUNT}
@@ -47,11 +47,11 @@ EOF
 echo "cat pppoe-settings"
 cat /home/build/immortalwrt/files/etc/config/pppoe-settings
 
-# 输出调试信息
+# Output debugging information
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting build process..."
 
 
-# 定义所需安装的包列表 下列插件你都可以自行删减
+# Define the list of packages to install; you can remove any of the following plugins
 PACKAGES=""
 PACKAGES="$PACKAGES curl"
 PACKAGES="$PACKAGES luci-i18n-firewall-zh-cn"
@@ -67,22 +67,22 @@ PACKAGES="$PACKAGES luci-i18n-passwall-zh-cn"
 PACKAGES="$PACKAGES luci-app-openclash"
 PACKAGES="$PACKAGES luci-i18n-homeproxy-zh-cn"
 PACKAGES="$PACKAGES openssh-sftp-server"
-# 增加几个必备组件 方便用户安装iStore
+# Add several required components to make it easier to install iStore
 PACKAGES="$PACKAGES fdisk"
 PACKAGES="$PACKAGES script-utils"
-# 第三方软件包 合并
+# Merge third-party packages
 # ======== shell/custom-packages.sh =======
 PACKAGES="$PACKAGES $CUSTOM_PACKAGES"
 
-# 判断是否需要编译 Docker 插件
+# Determine whether to build the Docker plugin
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
     PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
     echo "Adding package: luci-i18n-dockerman-zh-cn"
 fi
 
-# 若构建openclash 则添加内核
+# Add the core when building OpenClash
 if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
-    echo "✅ 已选择 luci-app-openclash，添加 openclash core"
+    echo "✅ Selected luci-app-openclash; adding the OpenClash core"
     mkdir -p files/etc/openclash/core
     # Download clash_meta
     META_URL="https://raw.githubusercontent.com/vernesong/OpenClash/core/master/meta/clash-linux-arm64.tar.gz"
@@ -92,11 +92,11 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
 else
-    echo "⚪️ 未选择 luci-app-openclash"
+    echo "⚪️ luci-app-openclash was not selected"
 fi
 
 
-# 构建镜像
+# Build the image
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Building image with the following packages:"
 echo "$PACKAGES"
 
