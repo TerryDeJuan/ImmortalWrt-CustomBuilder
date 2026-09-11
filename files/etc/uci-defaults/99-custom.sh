@@ -7,6 +7,10 @@ echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
 # In this project, single-interface mode uses DHCP, allowing immediate internet and web access without requiring users to change the static IP in /etc/config/network
 # After flashing and completing setup, you can disable inbound WAN firewall traffic from the web interface
 # To do so, go to Network -> Firewall, select Reject for WAN inbound traffic, then save and apply
+if [ "$(cat /tmp/sysinfo/board_name 2>/dev/null || true)" = "friendlyarm,nanopi-r4s" ]; then
+    # The R4S VLAN initializer owns its network and firewall policy.
+    exit 0
+fi
 uci set firewall.@zone[1].input='ACCEPT'
 
 # Set a hostname mapping to fix connectivity issues on stock Android TV

@@ -123,20 +123,29 @@ Do not blindly copy every installed package into ImageBuilder. Base packages, de
 
 ## 5. Build the R4S image
 
-Use the Rockchip 24.10 workflow with:
+Use the Rockchip 25.12 workflow with:
 
 - profile: `friendlyarm_nanopi-r4s`;
 - an explicit ImmortalWrt release;
-- a root filesystem size that fits well below the actual SD-card capacity;
+- a 2 GiB root filesystem;
+- Docker enabled so first boot creates an ext4 third partition from the unused
+  SD-card space, mounts it at `/opt/docker`, and assigns it as Docker's data root;
 - only reviewed packages;
 - PPPoE credentials left out of GitHub inputs and repository files.
 
 Repository files that drive this path include:
 
-- `.github/workflows/build-rockchip-immortalWrt-24.10.x.yml`;
-- `rockchip/build24.sh`;
-- `shell/custom-packages.sh`;
+- `.github/workflows/build-rockchip-25.12.x.yml`;
+- `rockchip/build25.sh`;
+- `shell/apk-custom-packages.sh`;
+- `files/etc/uci-defaults/98-r4s-docker-storage.sh`;
 - `files/etc/uci-defaults/99-custom.sh`.
+
+The Docker partition initializer is R4S-specific and refuses to act when the
+expected board, boot disk, or root partition is absent. Existing `mmcblk0p3`
+content is never reformatted. Test the image on a spare SD card first: creating
+the partition is intentionally a one-time, destructive operation on previously
+unused space.
 
 The current first-boot script temporarily accepts inbound WAN traffic. Remove or gate that behavior before production deployment unless it is strictly required for an isolated first boot.
 
