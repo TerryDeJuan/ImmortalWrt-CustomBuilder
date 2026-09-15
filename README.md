@@ -38,6 +38,37 @@ Additional guidance is available in the [project wiki](https://github.com/wukong
 
 Changing the workflow's management IP is intended for multi-port devices only. It does not assign a fixed address to a single-port device.
 
+## Packages and identity
+
+The installed-package inventory from an existing router is not stored in this
+repository: it is device-specific and can contain sensitive configuration
+context. Run `opkg list-installed` on an OpenWrt 24.10 router, or
+`apk list --installed` on an OpenWrt 25.12 router. The repository's read-only
+collectors save those results as `packages-installed.txt`; use
+`tools/router-audit.sh` for an inventory or `tools/router-backup.sh` for an
+off-device backup. Review the list and select only top-level applications for
+ImageBuilder; do not paste the complete dependency list into a build.
+
+The long commented catalog in `shell/custom-packages.sh` is intentional. It is
+not installed merely because it appears there. Uncomment a `CUSTOM_PACKAGES=...`
+line to include that package set, or select a package through the workflow's
+manual options where one is provided. The build script sources this file and
+merges `CUSTOM_PACKAGES` into the ImageBuilder `PACKAGES` argument.
+
+For the Rockchip workflows, Docker is a manual `workflow_dispatch` choice named
+`include_docker`. Select `yes` to install the Docker runtime and storage
+helpers; select `no` to omit them. The default is now `no`, so Docker is
+opt-in rather than quietly consuming flash space.
+
+The current default login is **root** with the initial password **changeme**.
+Change this password immediately after first boot in **System → Administration**,
+or with `passwd` over the trusted LAN. The first-boot script sets the hostname
+to `peachwrt` and the firmware description to `PeachWRT`.
+The human-readable build name/description is currently set in
+`files/etc/uci-defaults/99-custom.sh` as `NEW_DESCRIPTION`; the actual network
+hostname is set there through the standard `system.@system[0].hostname` UCI
+setting.
+
 ## Installation and Safety
 
 - Verify that the selected image matches the exact target device before flashing. Back up the current configuration and data first.

@@ -3,6 +3,24 @@
 # Log file for debugging
 LOGFILE="/etc/config/uci-defaults-log.txt"
 echo "Starting 99-custom.sh at $(date)" >>$LOGFILE
+
+# Set the firmware identity and initial administrative credentials.
+# Change the password immediately after first boot over the trusted LAN.
+uci set system.@system[0].hostname='peachwrt'
+uci commit system
+if command -v chpasswd >/dev/null 2>&1; then
+    printf '%s\n' 'root:changeme' | chpasswd
+else
+    echo "chpasswd is unavailable; root password was not changed" >>$LOGFILE
+fi
+
+# Set build author information
+FILE_PATH="/etc/openwrt_release"
+NEW_DESCRIPTION="PeachWRT"
+if [ -f "$FILE_PATH" ]; then
+    sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
+fi
+
 # Set the default firewall rule so single-interface virtual machines can access the WebUI on first use
 # In this project, single-interface mode uses DHCP, allowing immediate internet and web access without requiring users to change the static IP in /etc/config/network
 # After flashing and completing setup, you can disable inbound WAN firewall traffic from the web interface
@@ -137,11 +155,6 @@ uci delete ttyd.@ttyd[0].interface
 # Allow SSH connections on all interfaces
 uci set dropbear.@dropbear[0].Interface=''
 uci commit
-
-# Set build author information
-FILE_PATH="/etc/openwrt_release"
-NEW_DESCRIPTION="Packaged by wukongdaily"
-sed -i "s/DISTRIB_DESCRIPTION='[^']*'/DISTRIB_DESCRIPTION='$NEW_DESCRIPTION'/" "$FILE_PATH"
 
 # If luci-app-advancedplus (Advanced Settings) is installed, remove zsh calls to prevent the /usb/bin/zsh: not found message
 if [ -f /usr/lib/lua/luci/controller/advancedplus.lua ]; then

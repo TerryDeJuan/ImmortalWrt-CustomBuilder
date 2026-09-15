@@ -61,10 +61,12 @@ PACKAGES="$PACKAGES luci-theme-argon"
 PACKAGES="$PACKAGES luci-app-argon-config"
 PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
-# Determine whether to build the Docker plugin
+# Docker is opt-in from the workflow_dispatch input. Keep the complete
+# runtime set together so selecting Docker actually installs dockerd, not
+# only its LuCI front end.
 if [ "$INCLUDE_DOCKER" = "yes" ]; then
-    PACKAGES="$PACKAGES luci-i18n-dockerman-zh-cn"
-    echo "Adding package: luci-i18n-dockerman-zh-cn"
+    PACKAGES="$PACKAGES docker dockerd luci-app-dockerman luci-i18n-dockerman-zh-cn parted e2fsprogs block-mount"
+    echo "Adding Docker and R4S storage provisioning packages"
 fi
 # File manager
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"

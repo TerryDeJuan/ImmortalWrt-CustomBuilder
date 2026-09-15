@@ -101,9 +101,9 @@ on:
         default: false
       include_docker:
         description: |
-          Build the Docker plugin?
+          Install Docker, dockerd, LuCI Docker management, and storage helpers?
         required: true
-        default: 'yes'
+        default: 'no'
         type: choice
         options:
           - 'yes'
@@ -216,7 +216,7 @@ jobs:
           - ✳️ **Software Router Model**: ${{ github.event.inputs.profile }}
           - 🏠 **Administration Address**: ${{ github.event.inputs.custom_router_ip }}
           - 👤 **Username**: root
-          - 🔑 **Password**: None
+          - 🔑 **Initial password**: changeme
           EOF
 
           if [ "${{ github.event.inputs.include_docker }}" == "yes" ]; then
