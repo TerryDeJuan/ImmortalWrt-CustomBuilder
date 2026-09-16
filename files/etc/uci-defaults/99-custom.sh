@@ -31,10 +31,11 @@ if [ "$(cat /tmp/sysinfo/board_name 2>/dev/null || true)" = "friendlyarm,nanopi-
 fi
 uci set firewall.@zone[1].input='ACCEPT'
 
-# Set a hostname mapping to fix connectivity issues on stock Android TV
-uci add dhcp domain
-uci set "dhcp.@domain[-1].name=time.android.com"
-uci set "dhcp.@domain[-1].ip=203.107.6.88"
+# Set a hostname mapping to fix connectivity issues on stock Android TV.
+# Not required for PeachWRT, so this optional workaround remains disabled.
+# uci add dhcp domain
+# uci set "dhcp.@domain[-1].name=time.android.com"
+# uci set "dhcp.@domain[-1].ip=203.107.6.88"
 
 # Check whether pppoe-settings exists; build.sh generates this file dynamically
 SETTINGS_FILE="/etc/config/pppoe-settings"

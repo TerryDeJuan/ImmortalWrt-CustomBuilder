@@ -55,6 +55,19 @@ line to include that package set, or select a package through the workflow's
 manual options where one is provided. The build script sources this file and
 merges `CUSTOM_PACKAGES` into the ImageBuilder `PACKAGES` argument.
 
+The R4S backup's `packages-installed.txt` contains 312 packages, including the
+old 5.4 kernel, kernel modules, shared libraries, base system, and dependency
+packages. Those exact versions must not be copied into a newer ImageBuilder:
+many are release- or architecture-specific and would either be unavailable or
+make the image inconsistent. The recovered block in
+`shell/custom-packages.sh` therefore contains the reviewed application-level
+subset from that backup; ImageBuilder resolves matching dependencies for the
+selected release. The current 24.10 R4S block contains only the application
+packages suitable for that opkg-based build. The complete raw inventory
+remains in the ignored local backup and is not uploaded to GitHub. The 25.12
+apk build uses `shell/apk-custom-packages.sh` separately and does not consume
+this legacy opkg list.
+
 For the Rockchip workflows, Docker is a manual `workflow_dispatch` choice named
 `include_docker`. Select `yes` to install the Docker runtime and storage
 helpers; select `no` to omit them. The default is now `no`, so Docker is

@@ -6,6 +6,16 @@
 # Note: If you are building firmware for a physical router, carefully consider which lines to uncomment because flash space is limited. If the image is too large or the build fails, adjust the comments in this file.
 # Because iStore integration is frequently toggled, it is now an option in the workflow UI. Select it to integrate iStore or leave it unselected to omit it, reducing the need to edit this file.
 
+# Recovered top-level applications from the private R4S backup at
+# local-backups/r4s-backup/packages-installed.txt. This is intentionally not
+# the complete installed-package export: base packages, dependencies, kernel
+# modules, and ABI-specific libraries must be resolved by the selected release.
+#
+# These names came from an older opkg-based R4S installation. They are
+# application-level packages only; the 25.12 apk build has a separate catalog
+# in shell/apk-custom-packages.sh and must not consume this opkg list.
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES automount bash btrfs-progs chinadns-ng ddns-go dnsmasq-full haproxy ip-full ipset iptables-mod-conntrack-extra iptables-mod-extra iptables-mod-fullconenat iptables-mod-iprange iptables-mod-tproxy luci-app-adguardhome luci-app-attendedsysupgrade luci-app-cpufreq luci-app-ddns-go luci-app-filetransfer luci-app-openclash luci-app-passwall luci-app-ttyd luci-app-turboacc luci-app-wireguard microsocks nano-full ntfs3-mount qrencode shadowsocks-libev-config shadowsocks-libev-ss-local shadowsocks-libev-ss-redir shadowsocks-libev-ss-server shadowsocks-rust-sslocal shadowsocksr-libev-ssr-local shadowsocksr-libev-ssr-redir shellsync simple-obfs-client smartmontools tcping trojan-plus unzip v2ray-core v2ray-plugin wget-ssl wireguard-tools xray-core"
+
 # Add the Run installer for quickly installing makeself-packaged run files. It currently conflicts with QuickFile's nginx configuration, so do not integrate QuickFile at the same time.
 #CUSTOM_PACKAGES="$CUSTOM_PACKAGES luci-app-run"
 # Home page and network wizard
