@@ -11,6 +11,7 @@ ROOT_PART="${R4S_STORAGE_ROOT_PART:-/dev/mmcblk0p2}"
 DOCKER_PART="${R4S_STORAGE_DOCKER_PART:-/dev/mmcblk0p3}"
 PARTITION_CHECK="${R4S_STORAGE_TEST_PARTITION:-$DOCKER_PART}"
 DOCKER_MOUNT="/opt/docker"
+DOCKER_BRIDGE_CIDR="172.30.0.1/24"
 
 log() {
     logger -t "$LOG_TAG" "$*" 2>/dev/null || true
@@ -98,6 +99,10 @@ fi
 
 uci set dockerd.globals='globals'
 uci set dockerd.globals.data_root="$DOCKER_MOUNT"
+# Keep Docker's default bridge outside the R4S LAN, Guest, and IoT networks.
+# Create additional user-defined Docker networks with explicit subnets inside
+# the separate 172.30.0.0/16 space.
+uci set dockerd.globals.bip="$DOCKER_BRIDGE_CIDR"
 uci commit dockerd
 /etc/init.d/dockerd enable 2>/dev/null || true
 /etc/init.d/dockerd start 2>/dev/null || true

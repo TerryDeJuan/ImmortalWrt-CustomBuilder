@@ -184,9 +184,9 @@ if [ -f /usr/bin/quickfile ]; then
     echo "fix quickfile nginx config" >>$LOGFILE
 fi
 
-# Configure Docker firewall rules if dockerd is installed
-# Expand the subnet range covered by Docker to '172.16.0.0/12'
-# Allow ports from various Docker containers to pass through the firewall
+# Configure Docker firewall rules if dockerd is installed. The dockerd package
+# owns the docker0 network/interface; do not match a broad private address range
+# because it can overlap the R4S IoT subnet 172.31.12.0/24.
 if command -v dockerd >/dev/null 2>&1; then
     echo "Docker detected; configuring firewall rules..."
     FW_FILE="/etc/config/firewall"
@@ -207,7 +207,8 @@ if command -v dockerd >/dev/null 2>&1; then
     # Commit the deletions
     uci commit firewall
 
-# Append the new zone and forwarding configuration
+# Append the new zone and forwarding configuration. Bind it to the named
+# Docker network rather than a broad source subnet.
 cat <<EOF >>"$FW_FILE"
 
 config zone 'docker'
@@ -215,7 +216,7 @@ config zone 'docker'
   option output 'ACCEPT'
   option forward 'ACCEPT'
   option name 'docker'
-  list subnet '172.16.0.0/12'
+  list network 'docker'
 
 config forwarding
   option src 'docker'

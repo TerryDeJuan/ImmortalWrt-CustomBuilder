@@ -1,5 +1,6 @@
 name: Build 25.12.x Rockchip
-# This workflow currently supports software from the imm repository; third-party software integration is not yet supported (planned)
+# This workflow uses the APK package path for ImmortalWrt 25.12 and includes
+# the reviewed R4S application baseline from shell/apk-custom-packages.sh.
 on:
   workflow_dispatch:
     inputs:
@@ -81,9 +82,9 @@ on:
         required: true
         default: 'friendlyarm_nanopi-r4s'
       custom_router_ip:
-        description: "Set the software router management address (only valid for multi-port software routers). Format: 192.168.x.1 or 10.x.x.1"
+        description: "R4S trusted management address (the VLAN initializer uses 10.0.3.1)"
         required: true
-        default: "192.168.100.1"
+        default: "10.0.3.1"
       rootfs_partsize:
         description: 'Root filesystem size (the R4S uses remaining SD-card space for Docker)'
         required: true
@@ -135,7 +136,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Set executable permissions
-        run: chmod +x ${{ github.workspace }}/rockchip/build24.sh
+        run: chmod +x ${{ github.workspace }}/rockchip/build25.sh
       
       - name: Save Custom Router IP into OpenWrt files
         run: |

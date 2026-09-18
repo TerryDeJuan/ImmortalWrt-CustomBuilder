@@ -10,6 +10,12 @@ The NanoPi R4S has two Ethernet interfaces. This design keeps `eth0` as PPPoE WA
 | Guest | 37 | `192.168.37.0/24` | `192.168.37.1` | DHCP, DNS, NTP, ping only |
 | IoT | 12 | `172.31.12.0/24` | `172.31.12.1` | LAN and later-selected remote private subnets only |
 
+Docker's default bridge is pinned to `172.30.0.0/24`, outside the routed
+VLANs. The firewall binds the Docker zone to the named `docker` network rather
+than treating the entire `172.16.0.0/12` range as Docker; that broad range
+includes the IoT subnet. Create additional Docker networks with explicit,
+reviewed subnets in the separate `172.30.0.0/16` space.
+
 The old backup confirms the LAN subnet as `10.0.3.0/24` with router address `10.0.3.1`. The previous untagged LAN is intentionally moved to VLAN 98, so the upstream switch/AP trunk must be changed at the same time as the router.
 
 ## Firewall policy

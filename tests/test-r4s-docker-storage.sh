@@ -100,6 +100,9 @@ grep -q 'parted .*mkpart.*100%' "$LOG" || fail "remaining-space partition was no
 grep -q 'mkfs.ext4 .*docker' "$LOG" || fail "Docker partition was not formatted"
 grep -q "uci set fstab.docker.target=/opt/docker" "$LOG" || fail "Docker mount target was not configured"
 grep -q "uci set dockerd.globals.data_root=/opt/docker" "$LOG" || fail "dockerd data root was not configured"
+grep -q "uci set dockerd.globals.bip=172.30.0.1/24" "$LOG" || fail "Docker bridge subnet was not pinned away from the IoT network"
+! grep -q "172.16.0.0/12" "$ROOT/files/etc/uci-defaults/99-custom.sh" || fail "Docker firewall still overlaps the IoT subnet"
+grep -q "list network 'docker'" "$ROOT/files/etc/uci-defaults/99-custom.sh" || fail "Docker firewall zone is not bound to the Docker network"
 
 cp "$LOG" "$TMP/first.log"
 : >"$LOG"
