@@ -8,7 +8,7 @@
 # opkg inventory in local-backups/r4s-backup is not portable to APK 25.12.
 # OpenClash's APK and compatible core/Geo databases are prepared by
 # rockchip/build25.sh when this package is selected.
-CUSTOM_PACKAGES="$CUSTOM_PACKAGES adguardhome luci-app-openclash luci-compat bash curl ip-full unzip"
+CUSTOM_PACKAGES="$CUSTOM_PACKAGES adguardhome luci-app-adguardhome luci-app-openclash luci-compat ddns-go luci-app-ddns-go bash curl ip-full unzip"
 
 # Note: If you are building firmware for a physical router, carefully consider which lines to uncomment because flash space is limited. If the image is too large or the build fails, adjust the comments in this file.
 # Home page and network wizard (this plugin depends on iStore, so integrating it also integrates iStore)
